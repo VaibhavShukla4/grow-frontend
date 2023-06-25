@@ -1,24 +1,74 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { CiDark, CiLight } from "react-icons/ci";
+import Account from "./pages/Account";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import { ToastProvider } from "react-toast-notifications";
+// this is for protected routes
+const ProtectedLayout = ({ children }) => {
+  const auth = localStorage.getItem("auth_token");
+  return auth ? (
+    <div>
+      <Navigate to="/account" replace={true} />
+      {children}
+    </div>
+  ) : (
+    <Navigate to="/" replace={true} />
+  );
+};
 
 function App() {
+  const [mode, setMode] = useState(false);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <ToastProvider autoDismiss={true} autoDismissTimeout="2000">
+      <Routes>
+        <Route
+          path="/account/*"
+          element={
+            <ProtectedLayout>
+              <Account />
+            </ProtectedLayout>
+          }
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <Route
+            index
+            element={
+              <Home
+                mode={mode}
+                CiDark={CiDark}
+                CiLight={CiLight}
+                setMode={setMode}
+              />
+            }
+          />
+        </Route>
+        <Route
+          path="/login"
+          element={
+            <Login
+              setMode={setMode}
+              mode={mode}
+              CiDark={CiDark}
+              CiLight={CiLight}
+            />
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <SignUp
+              setMode={setMode}
+              mode={mode}
+              CiDark={CiDark}
+              CiLight={CiLight}
+            />
+          }
+        />
+      </Routes>
+    </ToastProvider>
   );
 }
 
